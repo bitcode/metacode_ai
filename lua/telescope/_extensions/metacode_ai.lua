@@ -6,47 +6,44 @@ end
 
 local metacode_ai = {}
 
--- Define your custom pickers and actions here.
-function metacode_ai.example_picker()
-  -- Configure your picker options and mappings.
+function metacode_ai.metacode_ai_picker()
+  local user_question = vim.fn.input("Ask a question: ")
+
+  local function query_metacode_ai(package_name, package_version)
+    local result = vim.api.nvim_exec(
+      [[python3 << EOF
+import vim
+from metacode_ai.metacode_ai import MetaCodeAIQuery
+result = MetaCodeAIQuery(vim.eval('b:package_name'), vim.eval('b:package_version'), vim.eval('expand("%:p:h")'), vim.eval('b:user_question'))
+vim.command(f'let b:result = {result}')
+EOF]], true)
+    return vim.api.nvim_buf_get_var(0, "result")
+  end
+
+  local package_name = vim.g.metacode_ai_package_name
+  local package_version = vim.g.metacode_ai_package_version
+
+  local answer = query_metacode_ai(package_name, package_version)
+
   local opts = {
-    prompt_title = 'Example Picker',
-    sorter = telescope.sorters.get_generic_fuzzy_sorter(),
+    prompt_title = 'MetaCode AI Answer',
     layout_config = {
       prompt_position = "top",
-      prompt_height = 5,
+      preview_position = "top",
+      preview_height = 0.5,
     },
-    -- Add other picker configuration options here.
   }
-
-  local function example_action(prompt_bufnr)
-    -- Handle selected item and close Telescope window.
-    local entry = telescope.actions.get_selected_entry(prompt_bufnr)
-    telescope.actions.close(prompt_bufnr)
-
-    -- Perform your custom action on the selected item.
-    print('Selected entry: ', entry.value)
-  end
 
   telescope.pickers.new(opts, {
     prompt_title = opts.prompt_title,
     finder = telescope.finders.new_table {
-      -- Add your list of items here.
-      results = { 'item1', 'item2', 'item3' },
+      results = {answer},
       entry_maker = telescope.make_entry.gen_from_string(opts),
     },
-    previewer = telescope.previewers.display_content.new(opts),
-    sorter = opts.sorter,
-    attach_mappings = function(_, map)
-      -- Bind your custom action to the "Enter" key.
-      map('i', '<CR>', example_action)
-      map('n', '<CR>', example_action)
-      return true
-    end,
+    sorter = telescope.sorters.get_generic_fuzzy_sorter(),
   }):find()
 end
 
--- Register your extension with Telescope.
 telescope.extensions.metacode_ai = metacode_ai
 
 return metacode_ai

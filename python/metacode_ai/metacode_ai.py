@@ -6,62 +6,75 @@ import pynvim
 import requests
 
 from langchain import Chain, LanguageModelModule, PromptTemplate
+from langchain.llms import OpenAI
+from langchain.retrievers import ContextualCompressionRetriever
+from langchain.retrievers.document_compressors import LLMChainExtractor
 
 from .json_parser import parse_tsconfig
 from .toml_parser import parse_cargo_toml
 
-from .api_keys import (
-    OPENAI_API_KEY,
-    COHERE_API_KEY,
-    GOOSEAI_API_KEY,
-    HUGGINGFACEHUB_API_TOKEN,
-    HUGGINGFACE_API_KEY,
-    CEREBRIUMAI_API_KEY,
-    SERPAPI_API_KEY,
-    GOOGLE_API_KEY,
-    GOOGLE_CSE_ID,
-    WOLFRAM_ALPHA_APPID,
-)
+from dotenv import load_dotenv
 
+# Load environment variables from .env file
+load_dotenv()
+
+# Get API keys from environment variables
 API_KEYS = {
-    "openai_api_key": OPENAI_API_KEY,
-    "cohere_api_key": COHERE_API_KEY,
-    "gooseai_api_key": GOOSEAI_API_KEY,
-    "huggingfacehub_api_token": HUGGINGFACEHUB_API_TOKEN,
-    "huggingface_api_key": HUGGINGFACE_API_KEY,
-    "cerebriumai_api_key": CEREBRIUMAI_API_KEY,
-    "serpapi_api_key": SERPAPI_API_KEY,
-    "google_api_key": GOOGLE_API_KEY,
-    "google_cse_id": GOOGLE_CSE_ID,
-    "wolfram_alpha_appid": WOLFRAM_ALPHA_APPID,
+    "openai_api_key": os.getenv("OPENAI_API_KEY"),
+    "cohere_api_key": os.getenv("COHERE_API_KEY"),
+    "gooseai_api_key": os.getenv("GOOSEAI_API_KEY"),
+    "huggingfacehub_api_token": os.getenv("HUGGINGFACEHUB_API_TOKEN"),
+    "huggingface_api_key": os.getenv("HUGGINGFACE_API_KEY"),
+    "cerebriumai_api_key": os.getenv("CEREBRIUMAI_API_KEY"),
+    "serpapi_api_key": os.getenv("SERPAPI_API_KEY"),
+    "google_api_key": os.getenv("GOOGLE_API_KEY"),
+    "google_cse_id": os.getenv("GOOGLE_CSE_ID"),
+    "wolfram_alpha_appid": os.getenv("WOLFRAM_ALPHA_APPID"),
 }
+
+# Define the LangChain API URL
+LANGCHAIN_API_URL = "https://api.langchain.io/v1/chain"
 
 # Create a LanguageModelModule for LangChain
 langchain_llm = LanguageModelModule(
     LANGCHAIN_API_URL,
-    headers={"Content-Type": "application/json"},
+    headers={
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {API_KEYS['openai_api_key']}",
+    },
     method="post",
     **API_KEYS
 )
 
 # Define a PromptTemplate to manage and format prompts sent to LangChain API
-prompt_template = PromptTemplate("How to use {package} version {version}?")
+prompt_template = PromptTemplate(
+    "I am working with {package} version {version} in my project. "
+    "Please provide the most relevant and up-to-date information and "
+    "documentation to help me understand how to use this specific version "
+    "effectively. My question is: {user_question}"
+)
 
 # Create a Chain with the langchain_llm and prompt_template
 langchain_chain = Chain(langchain_llm, prompt_template)
 
 # Define a class for interacting with the LangChain API
 class LangChainClient:
-    def __init__(self):
+    def __init__(self, compression_retriever):  # Add the compression_retriever argument
         self.session = requests.Session()
+        self.compression_retriever = compression_retriever  # Save the retriever instance
         # Set up headers for API authentication
         self.session.headers.update(
             {
                 "Content-Type": "application/json",
+                "Authorization": f"Bearer {API_KEYS['openai_api_key']}",
             }
         )
 
-    def query_langchain(self, prompt, package_versions):
+def query_langchain(self, prompt, package_versions):
+        # Use the compression_retriever to get relevant documents
+        relevant_documents = self.compression_retriever.get_relevant_documents(prompt)
+        # Process the relevant_documents as required
+        # ...
         payload = {
             "prompt": prompt,
             "package_versions": package_versions,
@@ -72,17 +85,12 @@ class LangChainClient:
         response.raise_for_status()
         return response.json()
 
-def parse_tsconfig(file_path):
-    try:
-        with open(file_path, "r") as f:
-            content = f.read()
-        return json.loads(content)
-    except FileNotFoundError:
-        print("Error parsing tsconfig.json, file not found.")
-        return None
-    except json.JSONDecodeError:
-        print("Error parsing tsconfig.json, invalid JSON format.")
-        return None
+# Instantiate a LangChainClient with the compression_retriever instance
+langchain_client = LangChainClient(compression_retriever)
+
+# Set up the DocumentCompressor and ContextualCompressionRetriever instances
+compressor = LLMChainExtractor.from_llm(OpenAI(temperature=0))
+compression_retriever = ContextualCompressionRetriever(base_compressor=compressor, base_retriever=base_retriever)
 
 # Other parse functions remain the same
 
@@ -101,10 +109,14 @@ def extract_package_versions(tsconfig, package_json, cargo_toml):
 
     return package_versions
 
+def set_prompt_variables(package_name, package_version, user_question):
+    prompt_template.set_variables(package=package_name, version=package_version, user_question=user_question)
+
 @pynvim.function("MetaCodeAIQuery", sync=True)
 def MetaCodeAIQuery(nvim, args):
     package_name = args[0]
     project_root = Path(args[1])
+    user_question = args[2]  # Add this line to get the user's question
 
     tsconfig, package_json, cargo_toml = get_project_info(project_root)
 
@@ -116,10 +128,10 @@ def MetaCodeAIQuery(nvim, args):
         nvim.command(f'echo "Package {package_name} not found in the project"')
         return
 
-    prompt_template.set_variables(package=package_name, version=package_version)
+    set_prompt_variables(package_name, package_version, user_question)  # Update this line
 
     try:
-        response = langchain_chain.run()
+        response = langchain_client.query_langchain(prompt_template.render(), package_versions)
     except requests.RequestException as e:
         nvim.err_write(f"Error while querying LangChain API: {str(e)}\n")
         return
@@ -129,10 +141,11 @@ def MetaCodeAIQuery(nvim, args):
     buf = nvim.api.create_buf(False, True)
     nvim.api.buf_set_lines(buf, 0, -1, True, answer.splitlines())
 
-    width = min(80, nvim.api.win_get_width(0))
-
-# Neovim plugin class for MetaCodeAI
 @pynvim.plugin
 class MetaCodeAIPlugin:
     def __init__(self, nvim):
         self.nvim = nvim
+
+    @pynvim.command("MetaCodeAI", nargs="*", sync=True)
+    def MetaCodeAI_command(self, args):
+        self.nvim.call_function("MetaCodeAIQuery", args)
