@@ -1,0 +1,5 @@
+toml
+pynvim
+requests
+langchain
+python-dotenv

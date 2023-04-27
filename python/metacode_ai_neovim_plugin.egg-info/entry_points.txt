@@ -1,0 +1,2 @@
+[console_scripts]
+metacode-ai = metacode_ai.main:main

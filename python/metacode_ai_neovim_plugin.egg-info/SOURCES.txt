@@ -1,0 +1,12 @@
+setup.py
+metacode_ai/__init__.py
+metacode_ai/api_keys.py
+metacode_ai/json_parser.py
+metacode_ai/metacode_ai.py
+metacode_ai/toml_parser.py
+metacode_ai_neovim_plugin.egg-info/PKG-INFO
+metacode_ai_neovim_plugin.egg-info/SOURCES.txt
+metacode_ai_neovim_plugin.egg-info/dependency_links.txt
+metacode_ai_neovim_plugin.egg-info/entry_points.txt
+metacode_ai_neovim_plugin.egg-info/requires.txt
+metacode_ai_neovim_plugin.egg-info/top_level.txt

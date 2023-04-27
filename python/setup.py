@@ -5,11 +5,11 @@ setup(
     version="0.1.0",
     packages=find_packages(),
     install_requires=[
+        "toml",
         "pynvim",
         "requests",
-        "toml",
         "langchain",
-        # Add other required packages for LLMs here
+        "python-dotenv",
     ],
     entry_points={
         "console_scripts": [
