@@ -9,7 +9,7 @@ from langchain.llms import OpenAI
 from langchain.prompts import PromptTemplate
 from langchain.prompts import StringPromptTemplate
 from pydantic import BaseModel, validator
-from langchain.llms import OpenAI
+from langchain.llms.openai import OpenAI
 from langchain.agents import load_tools
 from langchain.agents import initialize_agent
 from langchain.agents import AgentType

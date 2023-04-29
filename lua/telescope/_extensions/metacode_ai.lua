@@ -4,9 +4,10 @@ if not has_telescope then
 end
 
 local builtin = require('telescope')
-local telescope = require('telescope')
 local finders = require('telescope.finders')
 local pickers = require('telescope.pickers')
+local actions = require('telescope.actions')
+local action_state = require('telescope.actions.state')
 
 local metacode_ai = {}
 
@@ -49,7 +50,7 @@ try:
     result = MetaCodeAIQuery('%s', '%s', vim.eval('expand("%:p:h")'), '%s')
 except Exception as e:
     result = str(e)
-result]], package_name, package_version, user_question)})
+result]], package_name, package_version, vim.fn.expand("%:p:h"), user_question)})
   return result
 end
 
