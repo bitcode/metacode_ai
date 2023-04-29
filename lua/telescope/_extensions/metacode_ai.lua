@@ -4,17 +4,17 @@ if not has_telescope then
 end
 
 local builtin = require('telescope')
-local themes = require('telescope.themes')
+local telescope = require('telescope')
+local finders = require('telescope.finders')
+local pickers = require('telescope.pickers')
 
 local metacode_ai = {}
 
-local function get_user_question(on_done)
-  local opts = {
-    prompt_title = "Enter your question",
-  }
+local function get_user_question(on_done, opts)
+  local config_opts = vim.tbl_extend("force", {prompt_title = "Enter your question"}, opts)
 
-  telescope.pickers.new(opts, {
-    prompt_title = opts.prompt_title,
+  telescope.pickers.new(config_opts, {
+    prompt_title = config_opts.prompt_title,
     finder = telescope.finders.new_table {
       results = {},
       entry_maker = function(entry)
@@ -33,7 +33,7 @@ local function get_user_question(on_done)
         on_done(selection.value)
       end
 
-      map("i", "<CR>", on_select)
+map("i", "<CR>", on_select)
       map("n", "<CR>", on_select)
 
       return true
@@ -41,25 +41,27 @@ local function get_user_question(on_done)
   }):find()
 end
 
-function metacode_ai.metacode_ai_picker()
-  get_user_question(function(user_question)
-    local function query_metacode_ai(package_name, package_version)
-      local result = vim.api.nvim_exec(
-        [[python3 << EOF
+local function query_metacode_ai(package_name, package_version, user_question)
+  local result = vim.api.nvim_call_function("py3eval", {string.format([[
 import vim
 from metacode_ai.metacode_ai import MetaCodeAIQuery
-result = MetaCodeAIQuery(vim.eval('b:package_name'), vim.eval('b:package_version'), vim.eval('expand("%:p:h")'), vim.eval('b:user_question'))
-vim.command(f'let b:result = {result}')
-EOF]], true)
-      return vim.api.nvim_buf_get_var(0, "result")
-    end
+try:
+    result = MetaCodeAIQuery('%s', '%s', vim.eval('expand("%:p:h")'), '%s')
+except Exception as e:
+    result = str(e)
+result]], package_name, package_version, user_question)})
+  return result
+end
 
-    local package_name = vim.g.metacode_ai_package_name
-    local package_version = vim.g.metacode_ai_package_version
+function metacode_ai.metacode_ai_picker(opts)
+  opts = opts or {}
+  get_user_question(function(user_question)
+    local package_name = vim.g.metacode_ai_package_name or "default_package_name"
+    local package_version = vim.g.metacode_ai_package_version or "default_package_version"
 
-    local answer = query_metacode_ai(package_name, package_version)
+    local answer = query_metacode_ai(package_name, package_version, user_question)
 
-    local opts = {
+    local default_opts = {
       prompt_title = 'MetaCode AI Answer',
       layout_config = {
         prompt_position = "top",
@@ -67,16 +69,17 @@ EOF]], true)
         preview_height = 0.5,
       },
     }
+    local config_opts = vim.tbl_extend("force", default_opts, opts)
 
-    telescope.pickers.new(opts, {
-      prompt_title = opts.prompt_title,
+    telescope.pickers.new(config_opts, {
+      prompt_title = config_opts.prompt_title,
       finder = telescope.finders.new_table {
         results = {answer},
-        entry_maker = telescope.make_entry.gen_from_string(opts),
+        entry_maker = telescope.make_entry.gen_from_string(config_opts),
       },
       sorter = telescope.sorters.get_generic_fuzzy_sorter(),
     }):find()
-  end)
+  end, opts)
 end
 
 telescope.extensions.metacode_ai = metacode_ai
