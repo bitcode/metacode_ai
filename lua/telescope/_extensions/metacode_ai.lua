@@ -83,6 +83,9 @@ function metacode_ai.metacode_ai_picker(opts)
   end, opts)
 end
 
-telescope.extensions.metacode_ai = metacode_ai
+return require("telescope").register_extension {
+  exports = {
+    metacode_ai_picker = metacode_ai.metacode_ai_picker
+  },
+}
 
-return metacode_ai
