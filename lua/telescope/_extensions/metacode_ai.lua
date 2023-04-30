@@ -71,7 +71,7 @@ function metacode_ai.metacode_ai_picker(opts)
     }
     local config_opts = vim.tbl_extend("force", default_opts, opts)
 
-    pickers(config_opts, {
+    pickers.new(config_opts, {
       prompt_title = config_opts.prompt_title,
       finder = telescope.finders.new_table {
         results = {answer},
