@@ -3,7 +3,7 @@ if not has_telescope then
   error('This extension requires nvim-telescope/telescope.nvim')
 end
 
-local builtin = require('telescope')
+local telescope = require('telescope')
 local finders = require('telescope.finders')
 local pickers = require('telescope.pickers')
 local actions = require('telescope.actions')
