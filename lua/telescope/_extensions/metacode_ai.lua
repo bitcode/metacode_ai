@@ -1,5 +1,4 @@
-local has_telescope, telescope = pcall(require, 'telescope.builtin')
-if not has_telescope then
+if not pcall(require, 'telescope') then
   error('This extension requires nvim-telescope/telescope.nvim')
 end
 
