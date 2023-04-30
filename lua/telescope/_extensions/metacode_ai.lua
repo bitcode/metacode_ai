@@ -5,7 +5,7 @@ end
 
 local builtin = require('telescope')
 local finders = require('telescope.finders')
-local pickers = require('telescope.pickers').new
+local pickers = require('telescope.pickers')
 local actions = require('telescope.actions')
 local action_state = require('telescope.actions.state')
 
@@ -14,7 +14,7 @@ local metacode_ai = {}
 local function get_user_question(on_done, opts)
   local config_opts = vim.tbl_extend("force", {prompt_title = "Enter your question"}, opts)
 
-  telescope.pickers.new(config_opts, {
+  pickers.new(config_opts, {
     prompt_title = config_opts.prompt_title,
     finder = telescope.finders.new_table {
       results = {},
@@ -34,7 +34,7 @@ local function get_user_question(on_done, opts)
         on_done(selection.value)
       end
 
-map("i", "<CR>", on_select)
+      map("i", "<CR>", on_select)
       map("n", "<CR>", on_select)
 
       return true
