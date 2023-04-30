@@ -5,7 +5,7 @@ end
 
 local builtin = require('telescope')
 local finders = require('telescope.finders')
-local pickers = require('telescope.pickers')
+local pickers = require('telescope.pickers').new
 local actions = require('telescope.actions')
 local action_state = require('telescope.actions.state')
 
@@ -60,7 +60,7 @@ function metacode_ai.metacode_ai_picker(opts)
     local package_name = vim.g.metacode_ai_package_name or "default_package_name"
     local package_version = vim.g.metacode_ai_package_version or "default_package_version"
 
-    local answer = query_metacode_ai(package_name, package_version, user_question)
+    local answer = vim.api.nvim_call_function("MetaCodeAIQuery", {package_name, package_version, user_question})
 
     local default_opts = {
       prompt_title = 'MetaCode AI Answer',
@@ -72,7 +72,7 @@ function metacode_ai.metacode_ai_picker(opts)
     }
     local config_opts = vim.tbl_extend("force", default_opts, opts)
 
-    telescope.pickers.new(config_opts, {
+    pickers(config_opts, {
       prompt_title = config_opts.prompt_title,
       finder = telescope.finders.new_table {
         results = {answer},

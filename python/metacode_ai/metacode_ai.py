@@ -16,6 +16,7 @@ from langchain.agents import AgentType
 from langchain.retrievers import ContextualCompressionRetriever
 from langchain.retrievers.document_compressors import LLMChainExtractor
 from langchain.utilities import SerpAPIWrapper
+from langchain.retrievers import BaseRetriever
 
 from .json_parser import parse_tsconfig
 from .toml_parser import parse_cargo_toml
@@ -104,6 +105,7 @@ class LangChainClient:
         return response.json()
 
 # Set up the DocumentCompressor and ContextualCompressionRetriever instances
+base_retriever = BaseRetriever(create_serpapi_agent())
 compressor = LLMChainExtractor.from_llm(OpenAI(api_key=API_KEYS['openai_api_key'], temperature=0))
 compression_retriever = ContextualCompressionRetriever(
     base_compressor=compressor, base_retriever=base_retriever)
