@@ -13,6 +13,8 @@ local metacode_ai = {}
 local function get_user_question(on_done, opts)
   local config_opts = vim.tbl_extend("force", {prompt_title = "Enter your question"}, opts)
 
+  local finders_module = opts.finders or require('telescope.finders')
+
   pickers.new(config_opts, {
     prompt_title = config_opts.prompt_title,
     finder = telescope.finders.new_table {
