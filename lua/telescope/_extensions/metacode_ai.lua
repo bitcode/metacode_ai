@@ -57,6 +57,11 @@ end
 
 function metacode_ai.metacode_ai_picker(opts)
   opts = opts or {}
+
+    -- Add the print statements here
+  print("opts: ")
+  print(vim.inspect(opts))
+
   get_user_question(function(user_question)
     local package_name = vim.g.metacode_ai_package_name or "default_package_name"
     local package_version = vim.g.metacode_ai_package_version or "default_package_version"
@@ -72,6 +77,10 @@ function metacode_ai.metacode_ai_picker(opts)
       },
     }
     local config_opts = vim.tbl_extend("force", default_opts, opts)
+
+        -- Add the print statements here
+    print("config_opts: ")
+    print(vim.inspect(config_opts))
 
     pickers.new(config_opts, {
       prompt_title = config_opts.prompt_title,
