@@ -17,7 +17,7 @@ local function get_user_question(on_done, opts)
 
   pickers.new(config_opts, {
     prompt_title = config_opts.prompt_title,
-    finder = telescope.finders.new_table {
+    finder = finders_module.new_table {  -- change this line
       results = {},
       entry_maker = function(entry)
         return {
