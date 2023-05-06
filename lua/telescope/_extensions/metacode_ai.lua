@@ -7,6 +7,7 @@ local finders = require('telescope.finders')
 local pickers = require('telescope.pickers')
 local actions = require('telescope.actions')
 local action_state = require('telescope.actions.state')
+local sorters = require('telescope.sorters')
 
 local metacode_ai = {}
 
@@ -27,7 +28,7 @@ local function get_user_question(on_done, opts)
         }
       end,
     },
-    sorter = telescope.sorters.get_generic_fuzzy_sorter(),
+    sorter = telescope.sorters.get_generic_fuzzy_sorter(opts),
     attach_mappings = function(prompt_bufnr, map)
       local function on_select()
         local selection = action_state.get_selected_entry()
