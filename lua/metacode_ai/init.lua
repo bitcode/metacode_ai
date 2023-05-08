@@ -6,6 +6,8 @@ local pickers = require('telescope.pickers')
 local actions = require('telescope.actions')
 local action_state = require('telescope.actions.state')
 local sorters = require('telescope.sorters')
+local conf = require("telescope.config").values
+
 
 local function get_user_question(on_done, opts)
   local config_opts = vim.tbl_extend("force", {prompt_title = "Enter your question"}, opts)
@@ -22,7 +24,7 @@ local function get_user_question(on_done, opts)
         }
       end,
     },
-    sorter = telescope.sorters.get_generic_fuzzy_sorter(opts),
+    sorter = conf.generic_sorter(opts),
     attach_mappings = function(prompt_bufnr, map)
       local function on_select()
         local selection = action_state.get_selected_entry()
@@ -75,7 +77,7 @@ function M.metacode_ai_picker(opts)
         results = {answer},
         entry_maker = telescope.make_entry.gen_from_string(config_opts),
       },
-      sorter = telescope.sorters.get_generic_fuzzy_sorter(),
+      sorter = conf.generic_sorter(opts),
     }):find()
   end, opts)
 end
