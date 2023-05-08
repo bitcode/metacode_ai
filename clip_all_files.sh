@@ -8,6 +8,10 @@ echo "lua/telescope/_extensions/metacode_ai.lua" >> "$temp_file"
 cat lua/telescope/_extensions/metacode_ai.lua >> "$temp_file"
 echo "" >> "$temp_file"
 
+echo "lua/metacode_ai/init.lua" >> "$temp_file"
+cat lua/metacode_ai/init.lua >> "$temp_file"
+echo "" >> "$temp_file"
+
 echo "plugin/metacode_ai.vim" >> "$temp_file"
 cat plugin/metacode_ai.vim >> "$temp_file"
 echo "" >> "$temp_file"

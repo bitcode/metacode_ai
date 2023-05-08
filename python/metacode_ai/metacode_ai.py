@@ -5,7 +5,6 @@ from pathlib import Path
 import pynvim
 import requests
 
-from langchain.llms import OpenAI
 from langchain.prompts import PromptTemplate
 from langchain.prompts import StringPromptTemplate
 from pydantic import BaseModel, validator
