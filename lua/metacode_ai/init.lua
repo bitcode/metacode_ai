@@ -86,6 +86,16 @@ function M.metacode_ai_picker(opts)
   }
   local config_opts = vim.tbl_extend("force", default_opts, opts)
 
+  local function on_select(prompt_bufnr, on_done)
+    local selection = action_state.get_selected_entry()
+    if not selection then
+      -- If there is no selection, just return
+      return
+    end
+    -- Call on_done with the selected value without closing the window
+    on_done(selection.value)
+  end
+
   pickers.new(config_opts, {
     prompt_title = config_opts.prompt_title,
     finder = finder,
