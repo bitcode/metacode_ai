@@ -30,7 +30,8 @@ Add the following line to your init.lua file:
 
 `require('telescope').load_extension('metacode_ai')`
 
-Create a `.env` file in your home directory with the following structure, replacing the placeholder values with your actual API keys:
+
+Replace the placeholder values with your actual API keys in the `.metacode_ai.env` file in your User's home directory:
 
 ```
 OPENAI_API_KEY=your_openai_api_key

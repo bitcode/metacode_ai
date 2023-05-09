@@ -4,6 +4,7 @@ import toml
 from pathlib import Path
 import pynvim
 import requests
+import os.path
 
 from langchain.prompts import PromptTemplate
 from langchain.prompts import StringPromptTemplate
@@ -16,14 +17,16 @@ from langchain.retrievers import ContextualCompressionRetriever
 from langchain.retrievers.document_compressors import LLMChainExtractor
 from langchain.utilities import SerpAPIWrapper
 from langchain.retrievers import BaseRetriever
+from dotenv import load_dotenv
 
 from .json_parser import parse_tsconfig
 from .toml_parser import parse_cargo_toml
 
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
-load_dotenv()
+# Load environment variables from .env file in the user's home directory
+env_file_path = os.path.join(os.path.expanduser("~"), ".metacode_ai.env")
+load_dotenv(dotenv_path=env_file_path)
 
 # Get API keys from environment variables
 API_KEYS = {

@@ -39,6 +39,14 @@ echo "" >> "$temp_file"
 echo "python/setup.py" >> "$temp_file"
 cat python/setup.py >> "$temp_file"
 
+echo "post_install.sh" >> "$temp_file"
+cat post_install.sh >> "$temp_file"
+echo "" >> "$temp_file"
+
+echo ".metacode_ai.env" >> "$temp_file"
+cat .metacode_ai.env >> "$temp_file"
+echo "" >> "$temp_file"
+
 # Copy the contents of the temporary file to the clipboard using xclip
 cat "$temp_file" | xclip -selection clipboard
 

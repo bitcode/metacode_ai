@@ -1,0 +1,8 @@
+# .gitignore
+
+# Python build artifacts
+python/build/
+python/*.egg-info/
+
+# Test files
+python/metacode_ai/test.txt
