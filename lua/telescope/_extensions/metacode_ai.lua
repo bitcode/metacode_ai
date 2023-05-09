@@ -8,6 +8,7 @@ return require('telescope').register_extension {
     -- access extension config and user config
   end,
   exports = {
-    metacode_ai = require('metacode_ai').metacode_ai_picker
+    --metacode_ai = require('metacode_ai').metacode_ai_picker
+    metacode_ai_picker = require('metacode_ai').metacode_ai_picker
   },
 }
