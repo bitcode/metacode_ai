@@ -26,11 +26,16 @@ local function get_user_question(on_done, opts)
     },
     sorter = conf.generic_sorter(opts),
     attach_mappings = function(prompt_bufnr, map)
-      local function on_select()
-        local selection = action_state.get_selected_entry()
-        actions.close(prompt_bufnr)
-        on_done(selection.value)
-      end
+	local function on_select()
+  local selection = action_state.get_selected_entry()
+  if not selection then
+    -- If there is no selection, close the prompt and return
+    actions.close(prompt_bufnr)
+    return
+  end
+  actions.close(prompt_bufnr)
+  on_done(selection.value)
+end
 
       map("i", "<CR>", on_select)
       map("n", "<CR>", on_select)
