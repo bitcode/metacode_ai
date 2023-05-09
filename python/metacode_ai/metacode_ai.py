@@ -26,7 +26,14 @@ from dotenv import load_dotenv
 
 # Load environment variables from .env file in the user's home directory
 env_file_path = os.path.join(os.path.expanduser("~"), ".metacode_ai.env")
-load_dotenv(dotenv_path=env_file_path)
+try:
+    load_dotenv(dotenv_path=env_file_path)
+except Exception as e:
+    print(f"Error while loading environment variables: {str(e)}")
+
+for key, value in API_KEYS.items():
+    if not value:
+        raise ValueError(f"{key} is not set in the environment variables.")
 
 # Get API keys from environment variables
 API_KEYS = {
@@ -127,12 +134,18 @@ def get_project_info(project_root):
     if tsconfig_path.is_file():
         tsconfig = parse_tsconfig(tsconfig_path)
 
-    if package_json_path.is_file():
+if package_json_path.is_file():
+    try:
         with open(package_json_path, "r") as f:
             package_json = json.load(f)
+    except Exception as e:
+        print(f"Error while parsing package.json: {str(e)}")
 
-    if cargo_toml_path.is_file():
+if cargo_toml_path.is_file():
+    try:
         cargo_toml = parse_cargo_toml(cargo_toml_path)
+    except Exception as e:
+        print(f"Error while parsing Cargo.toml: {str(e)}")
 
     return tsconfig, package_json, cargo_toml
 
@@ -178,13 +191,15 @@ def MetaCodeAIQuery(nvim, args):
     try:
         response = langchain_client.query_langchain(prompt_template.render(), package_versions)
     except requests.RequestException as e:
-        nvim.err_write(f"Error while querying LangChain API: {str(e)}\n")
+        nvim.command(f'echohl Error | echom "Error while querying LangChain API: {str(e)}" | echohl None')
         return
 
     answer = response["choices"][0]["text"] if response["choices"] else "No answer found"
 
     buf = nvim.api.create_buf(False, True)
     nvim.api.buf_set_lines(buf, 0, -1, True, answer.splitlines())
+    nvim.command(f'echo "Answer buffer created successfully. Use :bnext and :bprev to navigate buffers."')
+
 
 @pynvim.plugin
 class MetaCodeAIPlugin:

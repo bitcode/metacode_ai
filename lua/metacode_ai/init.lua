@@ -46,14 +46,7 @@ end
 end
 
 local function query_metacode_ai(package_name, package_version, user_question)
-  local result = vim.api.nvim_call_function("py3eval", {string.format([[
-import vim
-from metacode_ai.metacode_ai import MetaCodeAIQuery
-try:
-    result = MetaCodeAIQuery('%s', '%s', vim.eval('expand("%:p:h")'), '%s')
-except Exception as e:
-    result = str(e)
-result]], package_name, package_version, vim.fn.expand("%:p:h"), user_question)})
+  local result = vim.api.nvim_call_function("MetaCodeAIQuery", {package_name, package_version, user_question})
   return result
 end
 
@@ -64,7 +57,7 @@ function M.metacode_ai_picker(opts)
     local package_name = vim.g.metacode_ai_package_name or "default_package_name"
     local package_version = vim.g.metacode_ai_package_version or "default_package_version"
 
-    local answer = vim.api.nvim_call_function("MetaCodeAIQuery", {package_name, package_version, user_question})
+    local answer = query_metacode_ai(package_name, package_version, user_question)
 
     local default_opts = {
       prompt_title = 'MetaCode AI Answer',
