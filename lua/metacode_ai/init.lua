@@ -81,7 +81,6 @@ function M.metacode_ai_picker(opts)
     prompt_title = 'MetaCode AI Answer',
     layout_config = {
       prompt_position = "top",
-      preview_position = "top",
       preview_height = 0.5,
     },
   }
