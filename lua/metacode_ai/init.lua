@@ -33,6 +33,7 @@ local function get_user_question(on_done, opts)
     -- If there is no selection, just return
     return
   end
+  print("User question:", selection.value) -- Added for debugging
   -- Call on_done with the selected value without closing the window
   on_done(selection.value)
 end
@@ -46,6 +47,7 @@ end
 end
 
 local function query_metacode_ai(package_name, package_version, user_question)
+	print("Querying MetaCode AI with:", package_name, package_version, user_question) -- Added for debugging
   local result = vim.api.nvim_call_function("MetaCodeAIQuery", {package_name, package_version, user_question})
   return result
 end
@@ -89,6 +91,7 @@ function M.metacode_ai_picker(opts)
   local config_opts = vim.tbl_extend("force", default_opts, opts)
 
   local function on_select(prompt_bufnr, on_done)
+	   print("on_select called") -- Added for debugging
     local selection = action_state.get_selected_entry()
     if not selection then
       -- If there is no selection, just return
