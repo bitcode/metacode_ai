@@ -27,7 +27,7 @@ local function get_user_question(on_done, opts)
     sorter = conf.generic_sorter(opts),
     attach_mappings = function(prompt_bufnr, map)
 
-    local function on_select(prompt_bufnr, on_done)
+	    local function on_select(prompt_bufnr)
   local selection = action_state.get_selected_entry()
   if not selection then
     -- If there is no selection, just return
