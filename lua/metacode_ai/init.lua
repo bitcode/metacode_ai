@@ -78,12 +78,14 @@ function M.metacode_ai_picker(opts)
   end, opts)
 
   local default_opts = {
-    prompt_title = 'MetaCode AI Answer',
-    layout_config = {
-      prompt_position = "top",
-      preview_height = 0.5,
-    },
-  }
+  prompt_title = 'MetaCode AI Answer',
+  layout_strategy = "vertical",
+  layout_config = {
+    prompt_position = "top",
+    preview_height = 0.5,
+  },
+}
+
   local config_opts = vim.tbl_extend("force", default_opts, opts)
 
   local function on_select(prompt_bufnr, on_done)
