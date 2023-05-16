@@ -38,7 +38,7 @@ local function get_user_question(on_done, opts)
   on_done(selection.value)
 end
 
-      map("i", "<CR>", on_select)
+      map("i", "<CR>", function() on_select(prompt_bufnr) end)
       map("n", "<CR>", on_select)
 
       return true
@@ -48,7 +48,7 @@ end
 
 local function query_metacode_ai(package_name, package_version, user_question)
 	print("Querying MetaCode AI with:", package_name, package_version, user_question) -- Added for debugging
-  local result = vim.api.nvim_call_function("MetaCodeAIQuery", {package_name, package_version, user_question})
+  local result = vim.api.nvim_call_function("MetaCodeAIQuery", {package_name, package_version, user_question}, {})
   return result
 end
 
@@ -110,7 +110,7 @@ function M.metacode_ai_picker(opts)
       map("n", "<CR>", function() on_select(prompt_bufnr, update_finder_with_answer) end)
       return true
     end,
-  }):find()
+  }, {previewer = false}):find()
 end
 
 return M

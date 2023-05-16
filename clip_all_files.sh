@@ -1,57 +1,23 @@
 #!/bin/bash
 
-# Create a temporary file to store the concatenated contents
-temp_file=$(mktemp)
+# Initialize a variable to hold the file content
+content=""
 
-# Concatenate files with their names at the beginning
-echo "lua/telescope/_extensions/metacode_ai.lua" >> "$temp_file"
-cat lua/telescope/_extensions/metacode_ai.lua >> "$temp_file"
-echo "" >> "$temp_file"
+# Add content of each file to the variable
+for file in lua/metacode_ai/init.lua lua/telescope/_extensions/metacode_ai.lua plugin/metacode_ai.vim python/metacode_ai/metacode_ai.py
+do
+    if [ -f "$file" ]; then
+        content+="===== $file ====="
+        content+=$'\n'
+        content+=$(cat "$file")
+        content+=$'\n\n' # Adds a newline between files
+    else
+        echo "File $file does not exist"
+    fi
+done
 
-echo "lua/metacode_ai/init.lua" >> "$temp_file"
-cat lua/metacode_ai/init.lua >> "$temp_file"
-echo "" >> "$temp_file"
-
-echo "plugin/metacode_ai.vim" >> "$temp_file"
-cat plugin/metacode_ai.vim >> "$temp_file"
-echo "" >> "$temp_file"
-
-echo "python/metacode_ai/api_keys.py" >> "$temp_file"
-cat python/metacode_ai/api_keys.py >> "$temp_file"
-echo "" >> "$temp_file"
-
-echo "python/metacode_ai/__init__.py" >> "$temp_file"
-cat python/metacode_ai/__init__.py >> "$temp_file"
-echo "" >> "$temp_file"
-
-echo "python/metacode_ai/json_parser.py" >> "$temp_file"
-cat python/metacode_ai/json_parser.py >> "$temp_file"
-echo "" >> "$temp_file"
-
-echo "python/metacode_ai/metacode_ai.py" >> "$temp_file"
-cat python/metacode_ai/metacode_ai.py >> "$temp_file"
-echo "" >> "$temp_file"
-
-echo "python/metacode_ai/toml_parser.py" >> "$temp_file"
-cat python/metacode_ai/toml_parser.py >> "$temp_file"
-echo "" >> "$temp_file"
-
-echo "python/setup.py" >> "$temp_file"
-cat python/setup.py >> "$temp_file"
-
-echo "post_install.sh" >> "$temp_file"
-cat post_install.sh >> "$temp_file"
-echo "" >> "$temp_file"
-
-echo ".metacode_ai.env" >> "$temp_file"
-cat .metacode_ai.env >> "$temp_file"
-echo "" >> "$temp_file"
-
-# Copy the contents of the temporary file to the clipboard using xclip
-cat "$temp_file" | xclip -selection clipboard
-
-# Remove the temporary file
-rm "$temp_file"
+# Copy the concatenated content to the clipboard
+echo "$content" | xclip -selection clipboard
 
 echo "The contents have been copied to the clipboard."
 
